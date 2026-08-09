@@ -41,6 +41,12 @@ See `LICENSES/WhatCable.txt` for attribution.
 xcodebuild -project PowerBar.xcodeproj -scheme PowerBar -destination 'platform=macOS' test
 ```
 
+## Releases
+
+Direct distribution uses signed and notarized arm64 ZIPs attached to GitHub
+Releases. See [`docs/releasing.md`](docs/releasing.md) for the local and GitHub
+Actions release workflow.
+
 ## License
 
 PowerBar is released under the MIT License. The cable discovery and USB Power
