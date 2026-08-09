@@ -1,0 +1,38 @@
+name: PowerBar
+options:
+  bundleIdPrefix: com.erole
+  deploymentTarget:
+    macOS: "14.0"
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    DEVELOPMENT_TEAM: ""
+targets:
+  PowerBar:
+    type: application
+    platform: macOS
+    sources:
+      - PowerBar
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.erole.PowerBar
+        PRODUCT_NAME: PowerBar
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_CFBundleDisplayName: PowerBar
+        CODE_SIGN_STYLE: Automatic
+    scheme:
+      testTargets:
+        - PowerBarTests
+  PowerBarTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - PowerBarTests
+    dependencies:
+      - target: PowerBar
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.erole.PowerBarTests
+        GENERATE_INFOPLIST_FILE: YES

@@ -1,0 +1,428 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00664BC40D222B8A63B6A906 /* PowerMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3168611F0CB1016B0E680651 /* PowerMonitor.swift */; };
+		07821CB6237A111FF87D7212 /* CableStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73BE9AD07C523AE75D0A242 /* CableStatusTests.swift */; };
+		1D13CAAC474D3CE2EF963F2E /* CableModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AC064A256F9350F9104BED /* CableModels.swift */; };
+		2FB274C7D0848F80C205E57D /* LaunchAtLoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15262D6938DA42707E7663E8 /* LaunchAtLoginController.swift */; };
+		5187E0640E31E75020E0A0EF /* PowerBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62DF852AB5CAF40A88622DB /* PowerBarApp.swift */; };
+		551999AAF9B1C999BB98156B /* PowerBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7339735B1A310EAD97237EA7 /* PowerBarView.swift */; };
+		62E1B63633502C18D77D5FB6 /* CableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7693C77250CC3C98CA6335D9 /* CableDataSource.swift */; };
+		6DC2D6BB16485F865200A751 /* PowerParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC258A49EC73A2296D3FEB63 /* PowerParserTests.swift */; };
+		C787C52643836F5C55F3E904 /* PowerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA913F5AC38EBAB3AE3BB45 /* PowerDataSource.swift */; };
+		FCE3D2AA6E3A45FA2C0B5D23 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8B8EB32DEE095B165AA107 /* Models.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7730C70530990F9E46B488CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C2DF0B0D82AB28324E170728 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 331E4C6ED1ED3B0DAA38300F;
+			remoteInfo = PowerBar;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		15262D6938DA42707E7663E8 /* LaunchAtLoginController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginController.swift; sourceTree = "<group>"; };
+		3168611F0CB1016B0E680651 /* PowerMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerMonitor.swift; sourceTree = "<group>"; };
+		320284A0D6756F79C10D46E8 /* PowerBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PowerBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		45AC064A256F9350F9104BED /* CableModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CableModels.swift; sourceTree = "<group>"; };
+		53980A09B511EE59F740D869 /* PowerBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PowerBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7339735B1A310EAD97237EA7 /* PowerBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerBarView.swift; sourceTree = "<group>"; };
+		7693C77250CC3C98CA6335D9 /* CableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CableDataSource.swift; sourceTree = "<group>"; };
+		D62DF852AB5CAF40A88622DB /* PowerBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerBarApp.swift; sourceTree = "<group>"; };
+		DB8B8EB32DEE095B165AA107 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		F73BE9AD07C523AE75D0A242 /* CableStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CableStatusTests.swift; sourceTree = "<group>"; };
+		FBA913F5AC38EBAB3AE3BB45 /* PowerDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerDataSource.swift; sourceTree = "<group>"; };
+		FC258A49EC73A2296D3FEB63 /* PowerParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerParserTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		48D2AB163D5FB62AB79287C6 /* PowerBarTests */ = {
+			isa = PBXGroup;
+			children = (
+				F73BE9AD07C523AE75D0A242 /* CableStatusTests.swift */,
+				FC258A49EC73A2296D3FEB63 /* PowerParserTests.swift */,
+			);
+			path = PowerBarTests;
+			sourceTree = "<group>";
+		};
+		A6683CF90CD700C5715BAE54 /* PowerBar */ = {
+			isa = PBXGroup;
+			children = (
+				7693C77250CC3C98CA6335D9 /* CableDataSource.swift */,
+				45AC064A256F9350F9104BED /* CableModels.swift */,
+				15262D6938DA42707E7663E8 /* LaunchAtLoginController.swift */,
+				DB8B8EB32DEE095B165AA107 /* Models.swift */,
+				D62DF852AB5CAF40A88622DB /* PowerBarApp.swift */,
+				7339735B1A310EAD97237EA7 /* PowerBarView.swift */,
+				FBA913F5AC38EBAB3AE3BB45 /* PowerDataSource.swift */,
+				3168611F0CB1016B0E680651 /* PowerMonitor.swift */,
+			);
+			path = PowerBar;
+			sourceTree = "<group>";
+		};
+		B11688F5B01A84FB3BB57CB5 = {
+			isa = PBXGroup;
+			children = (
+				A6683CF90CD700C5715BAE54 /* PowerBar */,
+				48D2AB163D5FB62AB79287C6 /* PowerBarTests */,
+				DDFDAAC27E4999E32B2B77E0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DDFDAAC27E4999E32B2B77E0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				320284A0D6756F79C10D46E8 /* PowerBar.app */,
+				53980A09B511EE59F740D869 /* PowerBarTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		331E4C6ED1ED3B0DAA38300F /* PowerBar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FD349F563806B0533958BCE2 /* Build configuration list for PBXNativeTarget "PowerBar" */;
+			buildPhases = (
+				C177D79E4B89E1B5EDDBCC59 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PowerBar;
+			packageProductDependencies = (
+			);
+			productName = PowerBar;
+			productReference = 320284A0D6756F79C10D46E8 /* PowerBar.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E87951D240C82D081800D5D3 /* PowerBarTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC36622B45A1DE1020A078E4 /* Build configuration list for PBXNativeTarget "PowerBarTests" */;
+			buildPhases = (
+				72CA3C3A4325AD4D852762CF /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				05677A37F2990687212173F1 /* PBXTargetDependency */,
+			);
+			name = PowerBarTests;
+			packageProductDependencies = (
+			);
+			productName = PowerBarTests;
+			productReference = 53980A09B511EE59F740D869 /* PowerBarTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C2DF0B0D82AB28324E170728 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					331E4C6ED1ED3B0DAA38300F = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					E87951D240C82D081800D5D3 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = 3C38A4D18A7DF90ECE8FE850 /* Build configuration list for PBXProject "PowerBar" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = B11688F5B01A84FB3BB57CB5;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = DDFDAAC27E4999E32B2B77E0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				331E4C6ED1ED3B0DAA38300F /* PowerBar */,
+				E87951D240C82D081800D5D3 /* PowerBarTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		72CA3C3A4325AD4D852762CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07821CB6237A111FF87D7212 /* CableStatusTests.swift in Sources */,
+				6DC2D6BB16485F865200A751 /* PowerParserTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C177D79E4B89E1B5EDDBCC59 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62E1B63633502C18D77D5FB6 /* CableDataSource.swift in Sources */,
+				1D13CAAC474D3CE2EF963F2E /* CableModels.swift in Sources */,
+				2FB274C7D0848F80C205E57D /* LaunchAtLoginController.swift in Sources */,
+				FCE3D2AA6E3A45FA2C0B5D23 /* Models.swift in Sources */,
+				5187E0640E31E75020E0A0EF /* PowerBarApp.swift in Sources */,
+				551999AAF9B1C999BB98156B /* PowerBarView.swift in Sources */,
+				C787C52643836F5C55F3E904 /* PowerDataSource.swift in Sources */,
+				00664BC40D222B8A63B6A906 /* PowerMonitor.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		05677A37F2990687212173F1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 331E4C6ED1ED3B0DAA38300F /* PowerBar */;
+			targetProxy = 7730C70530990F9E46B488CB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		10DAEEF09ADE602E369E148C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.erole.PowerBarTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PowerBar.app/Contents/MacOS/PowerBar";
+			};
+			name = Debug;
+		};
+		240B14C168C8770A1969F1AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.erole.PowerBarTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PowerBar.app/Contents/MacOS/PowerBar";
+			};
+			name = Release;
+		};
+		291510093BC52A25BCA4F047 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		52DC2C3D9D0F39BC54D0241C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		9290B64C590A90B8EFA9FC71 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PowerBar;
+				INFOPLIST_KEY_LSUIElement = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.erole.PowerBar;
+				PRODUCT_NAME = PowerBar;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F2DBCF7C041853CF84077965 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PowerBar;
+				INFOPLIST_KEY_LSUIElement = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.erole.PowerBar;
+				PRODUCT_NAME = PowerBar;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3C38A4D18A7DF90ECE8FE850 /* Build configuration list for PBXProject "PowerBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52DC2C3D9D0F39BC54D0241C /* Debug */,
+				291510093BC52A25BCA4F047 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BC36622B45A1DE1020A078E4 /* Build configuration list for PBXNativeTarget "PowerBarTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10DAEEF09ADE602E369E148C /* Debug */,
+				240B14C168C8770A1969F1AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FD349F563806B0533958BCE2 /* Build configuration list for PBXNativeTarget "PowerBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2DBCF7C041853CF84077965 /* Debug */,
+				9290B64C590A90B8EFA9FC71 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C2DF0B0D82AB28324E170728 /* Project object */;
+}
