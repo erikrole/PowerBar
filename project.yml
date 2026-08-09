@@ -25,6 +25,7 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_LSUIElement: YES
         INFOPLIST_KEY_CFBundleDisplayName: PowerBar
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.utilities"
         CODE_SIGN_STYLE: Automatic
     scheme:
       testTargets:
