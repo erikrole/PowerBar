@@ -69,7 +69,7 @@ xcodebuild archive \
     -archivePath "$ARCHIVE_PATH" \
     DEVELOPMENT_TEAM="$TEAM_ID" \
     CODE_SIGN_IDENTITY="$DEVELOPER_IDENTITY" \
-    CODE_SIGN_STYLE=Automatic \
+    CODE_SIGN_STYLE=Manual \
     ENABLE_HARDENED_RUNTIME=YES \
     ARCHS=arm64
 
@@ -82,7 +82,9 @@ cat > "$EXPORT_OPTIONS" <<PLIST
     <key>method</key>
     <string>developer-id</string>
     <key>signingStyle</key>
-    <string>automatic</string>
+    <string>manual</string>
+    <key>signingCertificate</key>
+    <string>Developer ID Application</string>
     <key>teamID</key>
     <string>${TEAM_ID}</string>
 </dict>
@@ -104,8 +106,13 @@ test -d "$APP_PATH" || {
 }
 
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
-codesign -dvvv "$APP_PATH" 2>&1 | grep -q "Authority=Developer ID Application" || {
+SIGNING_DETAILS="$(codesign -dvvv "$APP_PATH" 2>&1)"
+[[ "$SIGNING_DETAILS" == *"Authority=Developer ID Application"* ]] || {
     echo "Export is not signed with Developer ID Application: $DEVELOPER_IDENTITY" >&2
+    exit 1
+}
+[[ "$SIGNING_DETAILS" == *"Timestamp="* ]] || {
+    echo "Export does not contain a secure signing timestamp." >&2
     exit 1
 }
 
