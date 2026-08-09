@@ -138,7 +138,10 @@ xcrun stapler staple "$APP_PATH"
 xcrun stapler validate "$APP_PATH"
 rm -f "$ZIP_PATH"
 ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
-shasum -a 256 "$ZIP_PATH" > "$SHA_PATH"
+(
+    cd "$(dirname "$ZIP_PATH")"
+    shasum -a 256 "$(basename "$ZIP_PATH")"
+) > "$SHA_PATH"
 
 echo "Release artifacts:"
 echo "  $ZIP_PATH"
