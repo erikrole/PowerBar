@@ -8,16 +8,18 @@ import IOKit.ps
 // https://github.com/darrylmorley/whatcable/tree/cb778bc52bd304fd640dd767fd2936feeb0f8049
 
 enum CableDataSource {
-    // PowerBar is built for the owner's M5 Max MacBook Pro. Current M5
-    // laptops publish their USB-C and MagSafe controllers through these
-    // modern HPM classes; legacy AppleTCController fallbacks would only add
-    // untested ambiguity for machines this app will never run on.
+    // Controller class names vary by Mac and macOS build. The owner's M5 Max
+    // currently publishes USB-C and MagSafe through AppleTCControllerType10/11,
+    // while other current systems expose the equivalent HPM interface classes.
+    // Registry-entry IDs are deduplicated when a service matches more than one.
     static let portClasses = [
+        "AppleTCControllerType10",
+        "AppleTCControllerType11",
         "AppleHPMInterfaceType10",
         "AppleHPMInterfaceType11",
     ]
 
-    private static let identityClasses = [
+    static let identityClasses = [
         "IOPortTransportComponentCCUSBPDSOPp",
         "IOPortTransportComponentCCUSBPDSOPpp",
     ]

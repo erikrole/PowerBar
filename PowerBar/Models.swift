@@ -21,12 +21,50 @@ struct BatteryReading: Codable, Equatable, Sendable {
         powerSource.localizedCaseInsensitiveCompare("AC Power") == .orderedSame
     }
 
-    var menuBarText: String {
+    var powerState: BatteryPowerState {
+        guard percentage != nil else { return .unavailable }
+        if isFullyCharged, isOnExternalPower { return .full }
+        if isCharging { return .charging }
+        if isOnExternalPower { return .pluggedIn }
+        return .onBattery
+    }
+
+    var levelText: String {
         percentage.map { "\($0)%" } ?? "—"
     }
 
+    var menuBarText: String {
+        powerState == .full ? "" : levelText
+    }
+
+    var statusTitle: String {
+        switch powerState {
+        case .unavailable: "Unavailable"
+        case .full: "Fully Charged"
+        case .charging: "Charging"
+        case .pluggedIn: "Plugged In"
+        case .onBattery: "On Battery"
+        }
+    }
+
+    var statusDetail: String {
+        switch powerState {
+        case .unavailable:
+            powerSource
+        case .full:
+            "Plugged in · Battery standing by"
+        case .charging:
+            [powerSource, formattedEstimate].compactMap { $0 }.joined(separator: " · ")
+        case .pluggedIn:
+            "External power · Charging paused"
+        case .onBattery:
+            [powerSource, formattedEstimate].compactMap { $0 }.joined(separator: " · ")
+        }
+    }
+
     var symbolName: String {
-        let suffix = isCharging ? ".bolt" : ""
+        if powerState == .pluggedIn { return "powerplug.fill" }
+        let suffix = powerState == .charging ? ".bolt" : ""
         guard let percentage else { return "battery.0percent\(suffix)" }
         switch percentage {
         case 90...: return "battery.100percent\(suffix)"
@@ -45,6 +83,15 @@ struct BatteryReading: Codable, Equatable, Sendable {
         temperatureFahrenheit.map { String(format: "%.1f °F", $0) } ?? "—"
     }
 
+    var temperaturePresentationText: String {
+        switch temperatureStatus {
+        case .normal: "\(temperatureText) · Typical"
+        case .warning: "\(temperatureText) · Elevated"
+        case .alert: "\(temperatureText) · High"
+        case .unavailable: temperatureText
+        }
+    }
+
     var temperatureStatus: TemperatureStatus {
         guard let temperatureFahrenheit else { return .unavailable }
         switch temperatureFahrenheit {
@@ -57,6 +104,7 @@ struct BatteryReading: Codable, Equatable, Sendable {
     var wattsText: String {
         guard let estimatedWatts else { return "—" }
         let magnitude = abs(estimatedWatts)
+        if magnitude < 0.05 { return "0.0 W" }
         if isCharging || estimatedWatts > 0 {
             return String(format: "+%.1f W", magnitude)
         }
@@ -65,13 +113,50 @@ struct BatteryReading: Codable, Equatable, Sendable {
 
     var wattDirection: String {
         guard estimatedWatts != nil else { return "Live estimate unavailable" }
+        if isBatteryIdle { return "Battery idle" }
         return isCharging ? "Into battery" : "Battery draw"
+    }
+
+    var livePowerExplanation: String {
+        if isBatteryIdle {
+            switch powerState {
+            case .full:
+                return "The battery is full. External power is running the Mac while the battery stands by."
+            case .pluggedIn:
+                return "External power is running the Mac while battery charging is paused."
+            default:
+                break
+            }
+        }
+        return "Instantaneous battery-flow estimate, not the power adapter’s rated wattage."
     }
 
     var accessibilitySummary: String {
         let level = percentage.map { "Battery \($0) percent" } ?? "Battery level unavailable"
-        return "\(level), \(state), \(wattsText)"
+        return "\(level), \(statusTitle), \(wattsText)"
     }
+
+    private var formattedEstimate: String? {
+        guard let estimate else { return nil }
+        let components = estimate.split(separator: ":").compactMap { Int($0) }
+        guard components.count == 2 else { return estimate }
+        guard components[0] > 0 || components[1] > 0 else { return nil }
+        let duration = components[0] == 0 ? "\(components[1])m" : "\(components[0])h \(components[1])m"
+        return powerState == .charging ? "\(duration) to full" : "\(duration) left"
+    }
+
+    private var isBatteryIdle: Bool {
+        guard isOnExternalPower, !isCharging, let estimatedWatts else { return false }
+        return abs(estimatedWatts) < 0.05
+    }
+}
+
+enum BatteryPowerState: Equatable, Sendable {
+    case unavailable
+    case full
+    case charging
+    case pluggedIn
+    case onBattery
 }
 
 enum TemperatureStatus: Equatable, Sendable {
@@ -329,15 +414,21 @@ struct SnapshotComparison: Equatable, Sendable {
             percentagePointDelta = nil
         }
 
-        if older.reading.isCharging == newer.reading.isCharging,
-           let olderWatts = older.reading.estimatedWatts,
-           let newerWatts = newer.reading.estimatedWatts {
+        if let olderWatts = older.reading.estimatedWatts,
+           let newerWatts = newer.reading.estimatedWatts,
+           Self.flowDirection(of: olderWatts) != 0,
+           Self.flowDirection(of: olderWatts) == Self.flowDirection(of: newerWatts) {
             wattDelta = newerWatts - olderWatts
         } else {
             wattDelta = nil
         }
 
         elapsed = max(0, newer.reading.capturedAt.timeIntervalSince(older.reading.capturedAt))
+    }
+
+    private static func flowDirection(of watts: Double) -> Int {
+        if abs(watts) < 0.05 { return 0 }
+        return watts > 0 ? 1 : -1
     }
 }
 

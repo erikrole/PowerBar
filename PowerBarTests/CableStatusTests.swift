@@ -68,6 +68,41 @@ final class CableStatusTests: XCTestCase {
         XCTAssertEqual(diagnostic.severity, .normal)
     }
 
+    func testFullBatteryUsesAConciseReadyState() {
+        let diagnostic = CableDiagnostic(
+            negotiatedWatts: 140,
+            chargerWatts: 140,
+            cableWatts: nil,
+            hasExternalPower: true,
+            isCharging: false,
+            isFullyCharged: true,
+            transportText: nil
+        )
+
+        XCTAssertEqual(diagnostic.title, "Fully charged")
+        XCTAssertEqual(
+            diagnostic.detail,
+            "Plugged in and running on external power. Charging will resume when needed."
+        )
+        XCTAssertEqual(diagnostic.severity, .normal)
+    }
+
+    func testPausedChargingUsesPluggedInLanguage() {
+        let diagnostic = CableDiagnostic(
+            negotiatedWatts: 96,
+            chargerWatts: 96,
+            cableWatts: nil,
+            hasExternalPower: true,
+            isCharging: false,
+            isFullyCharged: false,
+            transportText: nil
+        )
+
+        XCTAssertEqual(diagnostic.title, "Charging paused")
+        XCTAssertEqual(diagnostic.detail, "Plugged in. macOS has paused battery charging for now.")
+        XCTAssertEqual(diagnostic.severity, .informational)
+    }
+
     func testPrimaryPowerPortPrefersNegotiatedContract() {
         let display = CablePort(
             typeCode: 2,
@@ -122,7 +157,12 @@ final class CableStatusTests: XCTestCase {
             "TransportsActive": ["CIO", "USB4"],
         ]))
 
-        XCTAssertEqual(CableDataSource.portClasses, ["AppleHPMInterfaceType10", "AppleHPMInterfaceType11"])
+        XCTAssertEqual(CableDataSource.portClasses, [
+            "AppleTCControllerType10",
+            "AppleTCControllerType11",
+            "AppleHPMInterfaceType10",
+            "AppleHPMInterfaceType11",
+        ])
         XCTAssertEqual(port, RawPort(
             typeCode: 2,
             number: 4,
@@ -227,6 +267,75 @@ final class CableStatusTests: XCTestCase {
 
         XCTAssertEqual(resolution.status, .empty)
         XCTAssertNil(resolution.lastReliableAt)
+    }
+
+    func testCableConnectionChangeIncludesSpeedAndPower() {
+        let current = CableStatus(ports: [.fixture], adapterWatts: 140)
+
+        let changes = CableConnectionChange.changes(from: CableStatus(), to: current)
+        var battery = BatteryReading.empty
+        battery.powerSource = "AC Power"
+
+        XCTAssertEqual(changes, [.connected(.fixture)])
+        XCTAssertEqual(changes.first?.title, "USB-C Port 4 connected")
+        XCTAssertEqual(
+            changes.first?.notificationBody(battery: battery),
+            "USB4 · 80 Gbps · 240 W cable · 94 W power available"
+        )
+    }
+
+    func testCableDisconnectUsesLastKnownCapabilities() {
+        let previous = CableStatus(ports: [.fixture], adapterWatts: 140)
+        var battery = BatteryReading.empty
+        battery.percentage = 82
+        battery.powerSource = "Battery Power"
+
+        let changes = CableConnectionChange.changes(from: previous, to: CableStatus())
+
+        XCTAssertEqual(changes, [.disconnected(.fixture)])
+        XCTAssertEqual(changes.first?.title, "USB-C Port 4 disconnected")
+        XCTAssertEqual(
+            changes.first?.notificationBody(battery: battery),
+            "Running on battery · 82%"
+        )
+    }
+
+    func testCableCapabilityRefreshDoesNotRepeatConnectionNotification() {
+        let preliminary = CablePort(
+            typeCode: 2,
+            number: 4,
+            typeName: "USB-C",
+            isConnected: true,
+            transports: ["USB4"],
+            negotiatedWatts: nil,
+            chargerWatts: nil,
+            cableWatts: nil,
+            cableSpeed: nil
+        )
+
+        let changes = CableConnectionChange.changes(
+            from: CableStatus(ports: [preliminary]),
+            to: CableStatus(ports: [.fixture])
+        )
+
+        XCTAssertTrue(changes.isEmpty)
+    }
+
+    func testUnavailableCableStatusNeverCreatesConnectionChanges() {
+        let connected = CableStatus(ports: [.fixture])
+
+        XCTAssertTrue(CableConnectionChange.changes(from: .empty, to: connected).isEmpty)
+        XCTAssertTrue(CableConnectionChange.changes(from: connected, to: .empty).isEmpty)
+    }
+
+    func testNotificationStateReprimesAfterUnavailableSample() {
+        var state = CableNotificationState()
+        let connected = CableStatus(ports: [.fixture])
+
+        state.prime(with: connected)
+        XCTAssertTrue(state.changes(for: .empty).isEmpty)
+        XCTAssertTrue(state.changes(for: connected).isEmpty)
+        XCTAssertEqual(state.changes(for: CableStatus()), [.disconnected(.fixture)])
     }
 }
 

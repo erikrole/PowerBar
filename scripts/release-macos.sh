@@ -8,8 +8,6 @@ PROJECT="PowerBar.xcodeproj"
 SCHEME="PowerBar"
 CONFIGURATION="Release"
 OUTPUT_DIR="${OUTPUT_DIR:-$ROOT_DIR/.release}"
-ARCHIVE_PATH="$OUTPUT_DIR/PowerBar.xcarchive"
-EXPORT_PATH="$OUTPUT_DIR/export"
 
 require_command() {
     command -v "$1" >/dev/null 2>&1 || {
@@ -49,8 +47,16 @@ if [[ -z "$NOTARY_PROFILE" && ( -z "$NOTARY_KEY_ID" || -z "$NOTARY_ISSUER_ID" ||
     exit 2
 fi
 
-rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
+OUTPUT_DIR="$(cd "$OUTPUT_DIR" && pwd -P)"
+if [[ "$OUTPUT_DIR" == "/" || "$OUTPUT_DIR" == "$ROOT_DIR" || "$OUTPUT_DIR" == "${HOME:-}" ]]; then
+    echo "Refusing unsafe OUTPUT_DIR: $OUTPUT_DIR" >&2
+    exit 2
+fi
+
+ARCHIVE_PATH="$OUTPUT_DIR/PowerBar.xcarchive"
+EXPORT_PATH="$OUTPUT_DIR/PowerBar-export"
+rm -rf "$ARCHIVE_PATH" "$EXPORT_PATH"
 
 xcodegen generate
 
@@ -60,6 +66,10 @@ if [[ -z "$VERSION" ]]; then
     echo "Could not read MARKETING_VERSION from Xcode build settings." >&2
     exit 1
 fi
+
+ZIP_PATH="$OUTPUT_DIR/PowerBar-${VERSION}-arm64.zip"
+SHA_PATH="$ZIP_PATH.sha256"
+rm -f "$ZIP_PATH" "$SHA_PATH"
 
 xcodebuild archive \
     -project "$PROJECT" \
@@ -97,8 +107,6 @@ xcodebuild -exportArchive \
     -exportOptionsPlist "$EXPORT_OPTIONS"
 
 APP_PATH="$EXPORT_PATH/PowerBar.app"
-ZIP_PATH="$OUTPUT_DIR/PowerBar-${VERSION}-arm64.zip"
-SHA_PATH="$ZIP_PATH.sha256"
 
 test -d "$APP_PATH" || {
     echo "Export did not produce $APP_PATH" >&2

@@ -60,14 +60,14 @@ struct PowerBarView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(monitor.reading.menuBarText)
+                    Text(monitor.reading.levelText)
                         .font(.system(size: 29, weight: .semibold, design: .rounded))
                         .contentTransition(.numericText())
-                    Text(monitor.reading.state.capitalized)
+                    Text(monitor.reading.statusTitle)
                         .font(.headline)
                         .foregroundStyle(.secondary)
                 }
-                Text(headerDetail)
+                Text(monitor.reading.statusDetail)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -98,7 +98,7 @@ struct PowerBarView: View {
                     .lineLimit(1)
                     .help(error)
             } else if let lastUpdated = monitor.lastUpdated {
-                Text("Updated \(lastUpdated, style: .relative) ago")
+                Text("Updated \(lastUpdated.relativeDescription)")
                     .foregroundStyle(.tertiary)
             } else {
                 Text("Reading power status…")
@@ -106,6 +106,23 @@ struct PowerBarView: View {
             }
             Spacer()
             Menu {
+                Toggle("Cable Notifications", isOn: Binding(
+                    get: { monitor.cableNotificationsEnabled },
+                    set: { monitor.setCableNotificationsEnabled($0) }
+                ))
+                Text("Permission: \(monitor.cableNotificationAuthorization.label)")
+                Button("Send Test Notification") {
+                    monitor.sendTestCableNotification()
+                }
+                if monitor.cableNotificationAuthorization == .denied {
+                    Button("Open Notification Settings…") {
+                        monitor.openNotificationSettings()
+                    }
+                }
+                if let feedback = monitor.cableNotificationFeedback {
+                    Text(feedback)
+                }
+                Divider()
                 Toggle("Launch at Login", isOn: Binding(
                     get: { launchAtLogin.isEnabled },
                     set: { launchAtLogin.setEnabled($0) }
@@ -126,33 +143,15 @@ struct PowerBarView: View {
             .menuStyle(.borderlessButton)
             .fixedSize()
             .help("PowerBar settings")
-            .accessibilityLabel("PowerBar settings, launch at login \(launchAtLogin.statusText)")
+            .accessibilityLabel("PowerBar settings")
         }
         .font(.caption)
         .padding(.horizontal, 16)
         .frame(height: 38)
     }
 
-    private var headerDetail: String {
-        let source = monitor.reading.powerSource
-        if let estimate = formattedEstimate { return "\(source) · \(estimate)" }
-        return source
-    }
-
-    private var formattedEstimate: String? {
-        guard let estimate = monitor.reading.estimate else { return nil }
-        let components = estimate.split(separator: ":").compactMap { Int($0) }
-        let duration: String
-        if components.count == 2 {
-            duration = components[0] == 0 ? "\(components[1])m" : "\(components[0])h \(components[1])m"
-        } else {
-            duration = estimate
-        }
-        return monitor.reading.isCharging ? "\(duration) to full" : "\(duration) left"
-    }
-
     private var levelColor: Color {
-        if monitor.reading.isCharging { return .green }
+        if monitor.reading.isOnExternalPower { return .green }
         if (monitor.reading.percentage ?? 100) <= 20 { return .red }
         return .primary
     }
@@ -199,7 +198,15 @@ private struct HistoryView: View {
 
             Divider()
 
-            if samples.count < 2 {
+            if monitor.historyLoadError != nil {
+                ContentUnavailableView {
+                    Label("Couldn’t Read History", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text("PowerBar left history.json unchanged so it can be recovered.")
+                } actions: {
+                    Button("Show in Finder") { monitor.openHistoryFile() }
+                }
+            } else if samples.count < 2 {
                 ContentUnavailableView(
                     "Gathering History",
                     systemImage: "chart.xyaxis.line",
@@ -354,7 +361,7 @@ private struct OverviewView: View {
                     Text(monitor.reading.wattDirection)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Text("Instantaneous battery-flow estimate, not the power adapter’s rated wattage.")
+                    Text(monitor.reading.livePowerExplanation)
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                 }
@@ -373,9 +380,10 @@ private struct OverviewView: View {
                     ReadingRow(label: "Current", value: monitor.reading.amperageMilliamps.map { String(format: "%.2f A", Double($0) / 1000) } ?? "—")
                     ReadingRow(
                         label: "Battery temperature",
-                        value: monitor.reading.temperatureText,
+                        value: monitor.reading.temperaturePresentationText,
                         valueColor: temperatureColor
                     )
+                    .help("Presentation cue only, not a battery safety limit")
                     ReadingRow(label: "Cycle count", value: monitor.reading.cycleCount.map(String.init) ?? "—")
                     ReadingRow(label: "Maximum capacity", value: monitor.reading.maxCapacity.map { "\($0)%" } ?? "—")
                 }
@@ -482,7 +490,19 @@ private struct ConnectionsView: View {
 
             Divider()
 
-            if monitor.cables.connectedPorts.isEmpty {
+            if !monitor.cables.isAvailable, monitor.lastUpdated == nil {
+                ContentUnavailableView(
+                    "Reading Ports",
+                    systemImage: "cable.connector",
+                    description: Text("Waiting for macOS to report USB-C and MagSafe state.")
+                )
+            } else if !monitor.cables.isAvailable {
+                ContentUnavailableView(
+                    "Port Details Unavailable",
+                    systemImage: "cable.connector.slash",
+                    description: Text("This Mac or the current macOS state is not exposing supported port telemetry.")
+                )
+            } else if monitor.cables.connectedPorts.isEmpty {
                 ContentUnavailableView(
                     "No Active Connections",
                     systemImage: "cable.connector.slash",
@@ -577,13 +597,22 @@ private struct EnergyUseCard: View {
                 if monitor.isRefreshingConsumers {
                     ProgressView().controlSize(.mini)
                 } else if let updated = monitor.consumersUpdated {
-                    Text(updated, style: .relative)
+                    Text(updated.relativeDescription)
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 }
             }
 
-            if visibleConsumers.isEmpty {
+            if let error = monitor.consumerError {
+                VStack(spacing: 4) {
+                    Label("Energy measurement unavailable", systemImage: "exclamationmark.triangle")
+                    Text(error)
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(2)
+                }
+                .font(.caption)
+                .frame(maxWidth: .infinity, minHeight: 36, alignment: .center)
+            } else if visibleConsumers.isEmpty {
                 Text(monitor.isRefreshingConsumers ? "Measuring active processes…" : "No significant process activity")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
@@ -684,7 +713,7 @@ private struct ActivityView: View {
                     }
                 }
 
-                activitySection("SLEEP & WAKE", empty: "No recent power events", items: monitor.events) { event in
+                activitySection("RECENT POWER EVENTS", empty: "No recent power events", items: monitor.events) { event in
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: event.symbolName)
                             .foregroundStyle(event.tintRole.color)
@@ -695,7 +724,7 @@ private struct ActivityView: View {
                                     .font(.subheadline.weight(.medium))
                                 Spacer()
                                 if let date = event.date {
-                                    Text(date, style: .relative)
+                                    Text(date.relativeDescription)
                                         .font(.caption)
                                         .foregroundStyle(.tertiary)
                                 }
@@ -746,6 +775,8 @@ private struct SnapshotsView: View {
                     Label("Capture Snapshot", systemImage: "camera")
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(monitor.reading.percentage == nil || monitor.snapshotLoadError != nil)
+                .help(snapshotCaptureHelp)
                 Spacer()
                 Button { monitor.openSnapshotsFolder() } label: {
                     Image(systemName: "folder")
@@ -753,11 +784,19 @@ private struct SnapshotsView: View {
                     .buttonStyle(.borderless)
                     .help("Show snapshots in Finder")
                     .accessibilityLabel("Show snapshots in Finder")
-                    .disabled(monitor.snapshots.isEmpty)
+                    .disabled(monitor.snapshots.isEmpty && monitor.snapshotLoadError == nil)
             }
             .padding(16)
 
-            if monitor.snapshots.isEmpty {
+            if monitor.snapshotLoadError != nil {
+                ContentUnavailableView {
+                    Label("Couldn’t Read Snapshots", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text("PowerBar left snapshots.json unchanged so it can be recovered.")
+                } actions: {
+                    Button("Show in Finder") { monitor.openSnapshotsFolder() }
+                }
+            } else if monitor.snapshots.isEmpty {
                 ContentUnavailableView("No Snapshots", systemImage: "camera", description: Text("Capture two readings to see how level and draw change."))
             } else {
                 List(Array(monitor.snapshots.enumerated()), id: \.element.id) { index, snapshot in
@@ -766,7 +805,7 @@ private struct SnapshotsView: View {
                             .font(.title3)
                             .foregroundStyle(snapshot.reading.isCharging ? .green : .primary)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("\(snapshot.reading.menuBarText) · \(snapshot.reading.wattsText)")
+                            Text("\(snapshot.reading.levelText) · \(snapshot.reading.wattsText)")
                                 .fontWeight(.medium)
                                 .monospacedDigit()
                             Text(snapshot.reading.state.capitalized)
@@ -783,6 +822,16 @@ private struct SnapshotsView: View {
                 .listStyle(.inset)
             }
         }
+    }
+
+    private var snapshotCaptureHelp: String {
+        if monitor.snapshotLoadError != nil {
+            return "Resolve the unreadable snapshot file before capturing a new snapshot"
+        }
+        if monitor.reading.percentage == nil {
+            return "Waiting for a battery reading"
+        }
+        return "Save the current battery reading"
     }
 
     private func comparison(at index: Int) -> SnapshotComparison? {
@@ -883,6 +932,14 @@ private extension TimeInterval {
         let days = hours / 24
         let remainingHours = hours % 24
         return remainingHours == 0 ? "\(days)d" : "\(days)d \(remainingHours)h"
+    }
+}
+
+private extension Date {
+    var relativeDescription: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        return formatter.localizedString(for: self, relativeTo: Date())
     }
 }
 

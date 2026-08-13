@@ -9,11 +9,23 @@ final class LaunchAtLoginController {
     private(set) var errorMessage: String?
 
     private let service = SMAppService.mainApp
+    private let defaults = UserDefaults.standard
 
     init() {
         status = service.status
         guard !Self.isRunningTests else { return }
-        enable()
+        let storedPreference = defaults.object(forKey: LaunchAtLoginPolicy.preferenceKey) as? Bool
+        guard let desiredEnabled = LaunchAtLoginPolicy.desiredEnabled(
+            storedPreference: storedPreference,
+            serviceStatus: status
+        ) else {
+            errorMessage = "Launch at Login is unavailable."
+            return
+        }
+        if storedPreference == nil {
+            defaults.set(desiredEnabled, forKey: LaunchAtLoginPolicy.preferenceKey)
+        }
+        desiredEnabled ? enable() : disable()
     }
 
     var isEnabled: Bool {
@@ -35,6 +47,7 @@ final class LaunchAtLoginController {
     }
 
     func setEnabled(_ enabled: Bool) {
+        defaults.set(enabled, forKey: LaunchAtLoginPolicy.preferenceKey)
         enabled ? enable() : disable()
     }
 
@@ -68,7 +81,10 @@ final class LaunchAtLoginController {
 
     private func disable() {
         refresh()
-        guard status != .notRegistered else { return }
+        guard status != .notRegistered, status != .notFound else {
+            errorMessage = nil
+            return
+        }
         do {
             try service.unregister()
             refresh()
@@ -81,5 +97,26 @@ final class LaunchAtLoginController {
 
     private static var isRunningTests: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+}
+
+enum LaunchAtLoginPolicy {
+    static let preferenceKey = "launchAtLoginEnabled"
+
+    static func desiredEnabled(
+        storedPreference: Bool?,
+        serviceStatus: SMAppService.Status
+    ) -> Bool? {
+        if let storedPreference { return storedPreference }
+        switch serviceStatus {
+        case .enabled:
+            return true
+        case .notRegistered, .requiresApproval:
+            return false
+        case .notFound:
+            return nil
+        @unknown default:
+            return nil
+        }
     }
 }

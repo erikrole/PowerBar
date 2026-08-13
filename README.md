@@ -18,13 +18,18 @@ The live wattage is calculated from smart-battery voltage × instantaneous curre
 
 Requirements: macOS 14 or later, Xcode, and XcodeGen.
 
+For an unsigned local contributor build:
+
 ```sh
 xcodegen generate
-xcodebuild -project PowerBar.xcodeproj -scheme PowerBar -configuration Debug build
+xcodebuild -project PowerBar.xcodeproj -scheme PowerBar -configuration Debug CODE_SIGNING_ALLOWED=NO build
 open ~/Library/Developer/Xcode/DerivedData/PowerBar-*/Build/Products/Debug/PowerBar.app
 ```
 
-PowerBar is an accessory app, so it appears only in the menu bar. It registers its installed main app to launch at login, refreshes every 15 seconds, records one automatic history sample per minute for 24 hours at `~/Library/Application Support/PowerBar/history.json`, and keeps up to 50 manual snapshots at `~/Library/Application Support/PowerBar/snapshots.json`.
+For a signed development launch, open the generated project in Xcode, configure
+a development team, and run the PowerBar scheme.
+
+PowerBar is an accessory app, so it appears only in the menu bar. Its Launch at Login setting follows the user’s saved choice, battery status refreshes every 15 seconds, and process-energy sampling runs only while the popover is open. PowerBar records one automatic history sample per minute for 24 hours at `~/Library/Application Support/PowerBar/history.json` and keeps up to 50 manual snapshots at `~/Library/Application Support/PowerBar/snapshots.json`.
 
 History and snapshots stay local to the Mac. The cable reader is scoped to the
 modern Apple HPM controller classes used by the target M5 laptop; other Macs
@@ -37,15 +42,17 @@ See `LICENSES/WhatCable.txt` for attribution.
 
 ## Test
 
+Contributor tests can run without a signing identity:
+
 ```sh
-xcodebuild -project PowerBar.xcodeproj -scheme PowerBar -destination 'platform=macOS' test
+xcodebuild -project PowerBar.xcodeproj -scheme PowerBar -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO test
 ```
 
 ## Releases
 
 Direct distribution uses signed and notarized arm64 ZIPs attached to GitHub
 Releases. See [`docs/releasing.md`](docs/releasing.md) for the local and GitHub
-Actions release workflow.
+Actions release workflow; those release paths retain their signing requirements.
 
 ## License
 

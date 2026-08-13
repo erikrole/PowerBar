@@ -13,7 +13,7 @@ struct PowerBarApp: App {
 }
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let monitor = PowerMonitor()
     private let launchAtLogin = LaunchAtLoginController()
     private let popover = NSPopover()
@@ -23,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         configurePopover()
         configureStatusItem()
         observeMonitor()
+        monitor.startCableNotifications()
     }
 
     private func configureStatusItem() {
@@ -43,10 +44,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func configurePopover() {
         popover.behavior = .transient
         popover.animates = true
+        popover.delegate = self
         popover.contentSize = NSSize(width: 370, height: 520)
         popover.contentViewController = NSHostingController(
             rootView: PowerBarView(monitor: monitor, launchAtLogin: launchAtLogin)
         )
+    }
+
+    func popoverDidShow(_ notification: Notification) {
+        monitor.setPopoverVisible(true)
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        monitor.setPopoverVisible(false)
     }
 
     private func observeMonitor() {
@@ -66,12 +76,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateStatusItem() {
         guard let button = statusItem?.button else { return }
         let reading = monitor.reading
-        let configuration = NSImage.SymbolConfiguration(pointSize: 14, weight: .medium)
-        button.image = NSImage(
+        var configuration = NSImage.SymbolConfiguration(pointSize: 14, weight: .medium)
+        if reading.powerState == .full {
+            configuration = configuration.applying(
+                NSImage.SymbolConfiguration(hierarchicalColor: .systemGreen)
+            )
+        }
+        let image = NSImage(
             systemSymbolName: reading.symbolName,
             accessibilityDescription: reading.accessibilitySummary
         )?.withSymbolConfiguration(configuration)
-        button.image?.isTemplate = true
+        image?.isTemplate = reading.powerState != .full
+        button.image = image
+        button.imagePosition = reading.powerState == .full ? .imageOnly : .imageLeading
         button.title = reading.menuBarText
         button.toolTip = reading.accessibilitySummary
         button.setAccessibilityLabel(reading.accessibilitySummary)

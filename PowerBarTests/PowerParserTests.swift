@@ -5,12 +5,68 @@ final class PowerParserTests: XCTestCase {
     func testMenuBarPresentationTracksBatteryLevelAndChargingState() {
         let discharging = BatteryReading(percentage: 47)
         let charging = BatteryReading(percentage: 82, isCharging: true)
+        let pluggedIn = BatteryReading(percentage: 82, powerSource: "AC Power")
+        let full = BatteryReading(
+            percentage: 100,
+            state: "charged",
+            estimate: "0:00",
+            powerSource: "AC Power",
+            voltageMillivolts: 12_625,
+            amperageMilliamps: 0,
+            estimatedWatts: 0,
+            isFullyCharged: true
+        )
+        let unpluggedFull = BatteryReading(
+            percentage: 100,
+            state: "charged",
+            powerSource: "Battery Power",
+            isFullyCharged: true
+        )
 
         XCTAssertEqual(discharging.menuBarText, "47%")
         XCTAssertEqual(discharging.symbolName, "battery.50percent")
+        XCTAssertEqual(discharging.statusTitle, "On Battery")
         XCTAssertEqual(charging.menuBarText, "82%")
         XCTAssertEqual(charging.symbolName, "battery.75percent.bolt")
+        XCTAssertEqual(charging.statusTitle, "Charging")
+        XCTAssertEqual(pluggedIn.symbolName, "powerplug.fill")
+        XCTAssertEqual(pluggedIn.statusTitle, "Plugged In")
+        XCTAssertEqual(pluggedIn.statusDetail, "External power · Charging paused")
+        XCTAssertEqual(full.menuBarText, "")
+        XCTAssertEqual(full.levelText, "100%")
+        XCTAssertEqual(full.statusTitle, "Fully Charged")
+        XCTAssertEqual(full.statusDetail, "Plugged in · Battery standing by")
+        XCTAssertEqual(full.wattsText, "0.0 W")
+        XCTAssertEqual(full.wattDirection, "Battery idle")
+        XCTAssertEqual(
+            full.livePowerExplanation,
+            "The battery is full. External power is running the Mac while the battery stands by."
+        )
+        XCTAssertEqual(unpluggedFull.powerState, .onBattery)
+        XCTAssertEqual(unpluggedFull.menuBarText, "100%")
+        XCTAssertEqual(unpluggedFull.symbolName, "battery.100percent")
+        XCTAssertEqual(unpluggedFull.statusTitle, "On Battery")
         XCTAssertEqual(BatteryReading.empty.menuBarText, "—")
+    }
+
+    func testFullBatteryParserProducesAFullExternalPowerState() {
+        let pmset = """
+        Now drawing from 'AC Power'
+         -InternalBattery-0 (id=1)\t100%; charged; 0:00 remaining present: true
+        """
+        let ioreg = """
+          \"Voltage\" = 12625
+          \"InstantAmperage\" = 0
+          \"IsCharging\" = No
+          \"FullyCharged\" = Yes
+        """
+
+        let reading = PowerParser.battery(pmset: pmset, ioreg: ioreg)
+
+        XCTAssertEqual(reading.powerState, .full)
+        XCTAssertEqual(reading.statusTitle, "Fully Charged")
+        XCTAssertFalse(reading.statusDetail.contains("0m"))
+        XCTAssertEqual(reading.wattsText, "0.0 W")
     }
 
     func testTemperatureUsesFahrenheitAndFriendlyThresholds() {
@@ -19,8 +75,11 @@ final class PowerParserTests: XCTestCase {
         let alert = BatteryReading(temperatureCelsius: 46)
 
         XCTAssertEqual(normal.temperatureText, "86.0 °F")
+        XCTAssertEqual(normal.temperaturePresentationText, "86.0 °F · Typical")
         XCTAssertEqual(normal.temperatureStatus, .normal)
+        XCTAssertEqual(warning.temperaturePresentationText, "104.0 °F · Elevated")
         XCTAssertEqual(warning.temperatureStatus, .warning)
+        XCTAssertEqual(alert.temperaturePresentationText, "114.8 °F · High")
         XCTAssertEqual(alert.temperatureStatus, .alert)
     }
 
@@ -29,6 +88,89 @@ final class PowerParserTests: XCTestCase {
 
         XCTAssertEqual(result.exitCode, 0)
         XCTAssertTrue(result.output.hasSuffix("100000\n"))
+    }
+
+    func testCommandRunnerRejectsNonzeroExit() async {
+        do {
+            _ = try await CommandRunner.run("/usr/bin/false", [])
+            XCTFail("Expected a nonzero exit to throw")
+        } catch let error as CommandRunnerError {
+            guard case .failed(let command, let exitCode, _) = error else {
+                return XCTFail("Unexpected command error: \(error)")
+            }
+            XCTAssertEqual(command, "false")
+            XCTAssertEqual(exitCode, 1)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testCommandRunnerTimesOutAndTerminatesChild() async {
+        let startedAt = Date()
+        do {
+            _ = try await CommandRunner.run("/bin/sleep", ["5"], timeout: 0.05)
+            XCTFail("Expected the command to time out")
+        } catch let error as CommandRunnerError {
+            guard case .timedOut(let command, _) = error else {
+                return XCTFail("Unexpected command error: \(error)")
+            }
+            XCTAssertEqual(command, "sleep")
+            XCTAssertLessThan(Date().timeIntervalSince(startedAt), 2)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testCommandRunnerCancellationTerminatesChild() async {
+        let startedAt = Date()
+        let task = Task {
+            try await CommandRunner.run("/bin/sleep", ["5"])
+        }
+        try? await Task.sleep(for: .milliseconds(50))
+        task.cancel()
+
+        do {
+            _ = try await task.value
+            XCTFail("Expected cancellation to stop the command")
+        } catch is CancellationError {
+            XCTAssertLessThan(Date().timeIntervalSince(startedAt), 2)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testCommandRunnerTimeoutKillsChildThatIgnoresTermination() async {
+        let startedAt = Date()
+        do {
+            _ = try await CommandRunner.run(
+                "/usr/bin/perl",
+                ["-e", "$SIG{TERM} = 'IGNORE'; sleep 5"],
+                timeout: 0.05
+            )
+            XCTFail("Expected the command to time out")
+        } catch let error as CommandRunnerError {
+            guard case .timedOut = error else {
+                return XCTFail("Unexpected command error: \(error)")
+            }
+            XCTAssertLessThan(Date().timeIntervalSince(startedAt), 2)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testCommandRunnerStopsAtOutputLimit() async {
+        do {
+            _ = try await CommandRunner.run("/usr/bin/yes", [], timeout: 2, outputLimit: 1_024)
+            XCTFail("Expected the output limit to stop the command")
+        } catch let error as CommandRunnerError {
+            guard case .outputLimitExceeded(let command, let bytes) = error else {
+                return XCTFail("Unexpected command error: \(error)")
+            }
+            XCTAssertEqual(command, "yes")
+            XCTAssertEqual(bytes, 1_024)
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
     }
 
     func testParsesDischargingBatteryAndSignedAmperage() {
@@ -85,6 +227,16 @@ final class PowerParserTests: XCTestCase {
 
         XCTAssertEqual(events.map(\.title), ["Wake", "Sleep", "Switched to battery"])
         XCTAssertNotNil(events.first?.date)
+    }
+
+    func testParsesISO8601PowerLogEvents() {
+        let input = "2026-08-12T15:26:50Z Wake from Deep Idle"
+
+        let events = PowerParser.events(input)
+
+        XCTAssertEqual(events.first?.title, "Wake")
+        XCTAssertNotNil(events.first?.date)
+        XCTAssertEqual(events.first?.detail, "Wake from Deep Idle")
     }
 
     func testGroupsPowerConsumersByOwningApplication() {
@@ -179,12 +331,62 @@ final class PowerParserTests: XCTestCase {
 
     func testSnapshotComparisonSuppressesWattsWhenDirectionChanges() {
         let older = snapshot(at: 0, percentage: 50, watts: -12, isCharging: false)
-        let newer = snapshot(at: 120, percentage: 51, watts: 18, isCharging: true)
+        let newer = snapshot(at: 120, percentage: 51, watts: 18, isCharging: false)
 
         let comparison = SnapshotComparison(older: older, newer: newer)
 
         XCTAssertEqual(comparison.percentagePointDelta, 1)
         XCTAssertNil(comparison.wattDelta)
+    }
+
+    func testSnapshotComparisonSuppressesWattsAtIdleBoundary() {
+        let older = snapshot(at: 0, percentage: 50, watts: 0, isCharging: false)
+        let newer = snapshot(at: 120, percentage: 50, watts: -2, isCharging: false)
+
+        XCTAssertNil(SnapshotComparison(older: older, newer: newer).wattDelta)
+    }
+
+    func testUnreadableLocalStoresAreNotTreatedAsEmpty() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "PowerBarTests-\(UUID().uuidString)", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let invalidFile = directory.appending(path: "invalid.json")
+        try Data("{not-json".utf8).write(to: invalidFile)
+
+        if case .loaded = SnapshotStore.load(from: invalidFile) {
+            XCTFail("Invalid snapshots must remain distinguishable from an empty store")
+        }
+        if case .loaded = HistoryStore.load(from: invalidFile) {
+            XCTFail("Invalid history must remain distinguishable from an empty store")
+        }
+    }
+
+    func testLaunchAtLoginPolicyPreservesExplicitChoice() {
+        XCTAssertEqual(LaunchAtLoginPolicy.desiredEnabled(
+            storedPreference: false,
+            serviceStatus: .enabled
+        ), false)
+        XCTAssertEqual(LaunchAtLoginPolicy.desiredEnabled(
+            storedPreference: true,
+            serviceStatus: .notRegistered
+        ), true)
+        XCTAssertEqual(LaunchAtLoginPolicy.desiredEnabled(
+            storedPreference: nil,
+            serviceStatus: .enabled
+        ), true)
+        XCTAssertEqual(LaunchAtLoginPolicy.desiredEnabled(
+            storedPreference: nil,
+            serviceStatus: .notRegistered
+        ), false)
+        XCTAssertEqual(LaunchAtLoginPolicy.desiredEnabled(
+            storedPreference: nil,
+            serviceStatus: .requiresApproval
+        ), false)
+        XCTAssertNil(LaunchAtLoginPolicy.desiredEnabled(
+            storedPreference: nil,
+            serviceStatus: .notFound
+        ))
     }
 
     func testHistoryPolicyFiltersAndSortsSamples() {

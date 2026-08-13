@@ -8,14 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		00664BC40D222B8A63B6A906 /* PowerMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3168611F0CB1016B0E680651 /* PowerMonitor.swift */; };
+		06D7E81407B42F73B9964922 /* PowerSourceObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96826878E696A7B4A4CF39C0 /* PowerSourceObserver.swift */; };
 		07821CB6237A111FF87D7212 /* CableStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73BE9AD07C523AE75D0A242 /* CableStatusTests.swift */; };
+		19242B66EDE829CD14385DB6 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = FBD649B0E3A195ACC5816336 /* AppIcon.icns */; };
 		1D13CAAC474D3CE2EF963F2E /* CableModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AC064A256F9350F9104BED /* CableModels.swift */; };
 		2FB274C7D0848F80C205E57D /* LaunchAtLoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15262D6938DA42707E7663E8 /* LaunchAtLoginController.swift */; };
 		5187E0640E31E75020E0A0EF /* PowerBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62DF852AB5CAF40A88622DB /* PowerBarApp.swift */; };
 		551999AAF9B1C999BB98156B /* PowerBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7339735B1A310EAD97237EA7 /* PowerBarView.swift */; };
+		5EBBDE71AA73DA22448F6AE4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 518F009FA94AEB15980936FC /* Assets.xcassets */; };
 		62E1B63633502C18D77D5FB6 /* CableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7693C77250CC3C98CA6335D9 /* CableDataSource.swift */; };
 		6DC2D6BB16485F865200A751 /* PowerParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC258A49EC73A2296D3FEB63 /* PowerParserTests.swift */; };
 		C787C52643836F5C55F3E904 /* PowerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA913F5AC38EBAB3AE3BB45 /* PowerDataSource.swift */; };
+		DD23CF6808CB75E3135AD4D5 /* CableNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501713BA30A9D6FA1EDBCFB3 /* CableNotifications.swift */; };
 		FCE3D2AA6E3A45FA2C0B5D23 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8B8EB32DEE095B165AA107 /* Models.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,17 +34,22 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		10367F88FB15ECD7E5E323AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		15262D6938DA42707E7663E8 /* LaunchAtLoginController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginController.swift; sourceTree = "<group>"; };
 		3168611F0CB1016B0E680651 /* PowerMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerMonitor.swift; sourceTree = "<group>"; };
 		320284A0D6756F79C10D46E8 /* PowerBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PowerBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45AC064A256F9350F9104BED /* CableModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CableModels.swift; sourceTree = "<group>"; };
+		501713BA30A9D6FA1EDBCFB3 /* CableNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CableNotifications.swift; sourceTree = "<group>"; };
+		518F009FA94AEB15980936FC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		53980A09B511EE59F740D869 /* PowerBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PowerBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7339735B1A310EAD97237EA7 /* PowerBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerBarView.swift; sourceTree = "<group>"; };
 		7693C77250CC3C98CA6335D9 /* CableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CableDataSource.swift; sourceTree = "<group>"; };
+		96826878E696A7B4A4CF39C0 /* PowerSourceObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerSourceObserver.swift; sourceTree = "<group>"; };
 		D62DF852AB5CAF40A88622DB /* PowerBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerBarApp.swift; sourceTree = "<group>"; };
 		DB8B8EB32DEE095B165AA107 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		F73BE9AD07C523AE75D0A242 /* CableStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CableStatusTests.swift; sourceTree = "<group>"; };
 		FBA913F5AC38EBAB3AE3BB45 /* PowerDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerDataSource.swift; sourceTree = "<group>"; };
+		FBD649B0E3A195ACC5816336 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		FC258A49EC73A2296D3FEB63 /* PowerParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerParserTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,14 +66,19 @@
 		A6683CF90CD700C5715BAE54 /* PowerBar */ = {
 			isa = PBXGroup;
 			children = (
+				FBD649B0E3A195ACC5816336 /* AppIcon.icns */,
+				518F009FA94AEB15980936FC /* Assets.xcassets */,
 				7693C77250CC3C98CA6335D9 /* CableDataSource.swift */,
 				45AC064A256F9350F9104BED /* CableModels.swift */,
+				501713BA30A9D6FA1EDBCFB3 /* CableNotifications.swift */,
+				10367F88FB15ECD7E5E323AC /* Info.plist */,
 				15262D6938DA42707E7663E8 /* LaunchAtLoginController.swift */,
 				DB8B8EB32DEE095B165AA107 /* Models.swift */,
 				D62DF852AB5CAF40A88622DB /* PowerBarApp.swift */,
 				7339735B1A310EAD97237EA7 /* PowerBarView.swift */,
 				FBA913F5AC38EBAB3AE3BB45 /* PowerDataSource.swift */,
 				3168611F0CB1016B0E680651 /* PowerMonitor.swift */,
+				96826878E696A7B4A4CF39C0 /* PowerSourceObserver.swift */,
 			);
 			path = PowerBar;
 			sourceTree = "<group>";
@@ -95,6 +109,7 @@
 			buildConfigurationList = FD349F563806B0533958BCE2 /* Build configuration list for PBXNativeTarget "PowerBar" */;
 			buildPhases = (
 				C177D79E4B89E1B5EDDBCC59 /* Sources */,
+				C64483E17FF9533DFA02304D /* Resources */,
 			);
 			buildRules = (
 			);
@@ -135,11 +150,11 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					331E4C6ED1ED3B0DAA38300F = {
-						DevelopmentTeam = "";
-						ProvisioningStyle = Automatic;
+						DevelopmentTeam = T26T3G8C7Q;
 					};
 					E87951D240C82D081800D5D3 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = T26T3G8C7Q;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -163,6 +178,18 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		C64483E17FF9533DFA02304D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				19242B66EDE829CD14385DB6 /* AppIcon.icns in Resources */,
+				5EBBDE71AA73DA22448F6AE4 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		72CA3C3A4325AD4D852762CF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -179,12 +206,14 @@
 			files = (
 				62E1B63633502C18D77D5FB6 /* CableDataSource.swift in Sources */,
 				1D13CAAC474D3CE2EF963F2E /* CableModels.swift in Sources */,
+				DD23CF6808CB75E3135AD4D5 /* CableNotifications.swift in Sources */,
 				2FB274C7D0848F80C205E57D /* LaunchAtLoginController.swift in Sources */,
 				FCE3D2AA6E3A45FA2C0B5D23 /* Models.swift in Sources */,
 				5187E0640E31E75020E0A0EF /* PowerBarApp.swift in Sources */,
 				551999AAF9B1C999BB98156B /* PowerBarView.swift in Sources */,
 				C787C52643836F5C55F3E904 /* PowerDataSource.swift in Sources */,
 				00664BC40D222B8A63B6A906 /* PowerMonitor.swift in Sources */,
+				06D7E81407B42F73B9964922 /* PowerSourceObserver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,7 +232,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = T26T3G8C7Q;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -220,7 +252,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = T26T3G8C7Q;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -357,16 +392,16 @@
 		9290B64C590A90B8EFA9FC71 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = T26T3G8C7Q;
 				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = PowerBar;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Erik Role";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PowerBar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -381,16 +416,16 @@
 		F2DBCF7C041853CF84077965 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = T26T3G8C7Q;
 				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = PowerBar;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Erik Role";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PowerBar/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
