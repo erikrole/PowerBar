@@ -18,10 +18,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let launchAtLogin = LaunchAtLoginController()
     private let popover = NSPopover()
     private var statusItem: NSStatusItem?
+    private var outsideClickMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         configurePopover()
         configureStatusItem()
+        configureOutsideClickMonitor()
         observeMonitor()
         monitor.startCableNotifications()
     }
@@ -39,6 +41,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         button.toolTip = "PowerBar"
         statusItem = item
         updateStatusItem()
+    }
+
+    private func configureOutsideClickMonitor() {
+        outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, self.popover.isShown else { return }
+                self.popover.performClose(nil)
+            }
+        }
     }
 
     private func configurePopover() {
@@ -70,6 +83,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
                 self.updateStatusItem()
                 self.observeMonitor()
             }
+        }
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        if let outsideClickMonitor {
+            NSEvent.removeMonitor(outsideClickMonitor)
         }
     }
 

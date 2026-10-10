@@ -5,14 +5,20 @@ import SwiftUI
 struct PowerBarView: View {
     @Bindable var monitor: PowerMonitor
     @Bindable var launchAtLogin: LaunchAtLoginController
-    @State private var section: Section = .overview
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var section: Section = .power
+    @State private var secondarySection: SecondarySection?
 
     enum Section: String, CaseIterable, Identifiable {
-        case overview = "Overview"
-        case activity = "Activity"
+        case power = "Power"
+        case charge = "Charge"
+        case usage = "Usage"
+        var id: Self { self }
+    }
+
+    enum SecondarySection: String, Identifiable {
         case history = "History"
         case snapshots = "Snapshots"
-        case connections = "Ports"
         var id: Self { self }
     }
 
@@ -20,25 +26,35 @@ struct PowerBarView: View {
         VStack(spacing: 0) {
             header
 
-            Picker("Section", selection: $section) {
-                ForEach(Section.allCases) { section in
-                    Text(section.rawValue).tag(section)
+            if let secondarySection {
+                secondaryNavigation(secondarySection)
+            } else {
+                Picker("Section", selection: $section) {
+                    ForEach(Section.allCases) { section in
+                        Text(section.rawValue).tag(section)
+                    }
                 }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .controlSize(.small)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
             }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .padding(.horizontal, 16)
-            .padding(.bottom, 12)
 
             Divider()
 
             Group {
-                switch section {
-                case .overview: OverviewView(monitor: monitor)
-                case .activity: ActivityView(monitor: monitor)
-                case .history: HistoryView(monitor: monitor)
-                case .snapshots: SnapshotsView(monitor: monitor)
-                case .connections: ConnectionsView(monitor: monitor)
+                if let secondarySection {
+                    switch secondarySection {
+                    case .history: HistoryView(monitor: monitor)
+                    case .snapshots: SnapshotsView(monitor: monitor)
+                    }
+                } else {
+                    switch section {
+                    case .power: PowerView(monitor: monitor)
+                    case .charge: ChargeView(monitor: monitor)
+                    case .usage: UsageView(monitor: monitor)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -50,27 +66,48 @@ struct PowerBarView: View {
         .background(.regularMaterial)
     }
 
+    private func secondaryNavigation(_ secondarySection: SecondarySection) -> some View {
+        HStack(spacing: 8) {
+            Button {
+                self.secondarySection = nil
+            } label: {
+                Label("Back", systemImage: "chevron.left")
+            }
+            .buttonStyle(.borderless)
+            .frame(minHeight: 24)
+
+            Text(secondarySection.rawValue)
+                .font(.headline)
+
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 12)
+    }
+
     private var header: some View {
         HStack(alignment: .center, spacing: 14) {
             Image(systemName: monitor.reading.symbolName)
                 .font(.system(size: 31, weight: .medium))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(levelColor)
-                .contentTransition(.symbolEffect(.replace))
+                .contentTransition(reduceMotion ? .identity : .symbolEffect(.replace))
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text(monitor.reading.levelText)
                         .font(.system(size: 29, weight: .semibold, design: .rounded))
-                        .contentTransition(.numericText())
+                        .contentTransition(reduceMotion ? .identity : .numericText())
                     Text(monitor.reading.statusTitle)
                         .font(.headline)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
                 Text(monitor.reading.statusDetail)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
             Button {
@@ -84,6 +121,7 @@ struct PowerBarView: View {
                 }
             }
             .buttonStyle(.borderless)
+            .frame(width: 24, height: 24)
             .help("Refresh now")
             .accessibilityLabel("Refresh power status")
         }
@@ -95,7 +133,8 @@ struct PowerBarView: View {
             if let error = monitor.lastError {
                 Label(error, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
                     .help(error)
             } else if let lastUpdated = monitor.lastUpdated {
                 Text("Updated \(lastUpdated.relativeDescription)")
@@ -106,6 +145,21 @@ struct PowerBarView: View {
             }
             Spacer()
             Menu {
+                SwiftUI.Section {
+                    Button {
+                        secondarySection = .history
+                    } label: {
+                        Label("Battery History", systemImage: "chart.xyaxis.line")
+                    }
+                    Button {
+                        secondarySection = .snapshots
+                    } label: {
+                        Label("Snapshots", systemImage: "camera")
+                    }
+                } header: {
+                    Text("More")
+                }
+                Divider()
                 Toggle("Cable Notifications", isOn: Binding(
                     get: { monitor.cableNotificationsEnabled },
                     set: { monitor.setCableNotificationsEnabled($0) }
@@ -141,7 +195,7 @@ struct PowerBarView: View {
                 Image(systemName: "ellipsis.circle")
             }
             .menuStyle(.borderlessButton)
-            .fixedSize()
+            .frame(width: 24, height: 24)
             .help("PowerBar settings")
             .accessibilityLabel("PowerBar settings")
         }
@@ -151,9 +205,7 @@ struct PowerBarView: View {
     }
 
     private var levelColor: Color {
-        if monitor.reading.isOnExternalPower { return .green }
-        if (monitor.reading.percentage ?? 100) <= 20 { return .red }
-        return .primary
+        batteryLevelColor(for: monitor.reading)
     }
 }
 
@@ -177,7 +229,7 @@ private struct HistoryView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("BATTERY HISTORY")
+                    Text("Battery history")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
                     Text("Sampled automatically each minute")
@@ -227,9 +279,9 @@ private struct HistoryView: View {
 
     private var historySummary: some View {
         HStack(spacing: 0) {
-            summaryValue("LEVEL CHANGE", value: levelChangeText)
+            summaryValue("Level change", value: levelChangeText)
             Divider().frame(height: 34).padding(.horizontal, 12)
-            summaryValue("AVERAGE FLOW", value: averageWattsText)
+            summaryValue("Average flow", value: averageWattsText)
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -238,7 +290,7 @@ private struct HistoryView: View {
 
     private var batteryChart: some View {
         VStack(alignment: .leading, spacing: 8) {
-            chartHeader("BATTERY LEVEL", value: percentageSamples.last?.percentage.map { "\($0)%" } ?? "—")
+            chartHeader("Battery level", value: percentageSamples.last?.percentage.map { "\($0)%" } ?? "—")
             Chart(percentageSamples) { sample in
                 if let percentage = sample.percentage {
                     AreaMark(
@@ -271,7 +323,7 @@ private struct HistoryView: View {
 
     private var wattChart: some View {
         VStack(alignment: .leading, spacing: 8) {
-            chartHeader("POWER FLOW", value: wattSamples.last?.estimatedWatts.map { String(format: "%+.1f W", $0) } ?? "—")
+            chartHeader("Power flow", value: wattSamples.last?.estimatedWatts.map { String(format: "%+.1f W", $0) } ?? "—")
             Chart(wattSamples) { sample in
                 if let watts = sample.estimatedWatts {
                     RuleMark(y: .value("Zero", 0))
@@ -339,58 +391,116 @@ private struct HistoryView: View {
     }
 }
 
-private struct OverviewView: View {
+private struct PowerView: View {
     let monitor: PowerMonitor
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 8) {
+                LivePowerCard(monitor: monitor)
+                PowerInputCard(monitor: monitor)
+                CableDetailsCard(monitor: monitor)
+            }
+            .padding(16)
+        }
+    }
+}
+
+private struct LivePowerCard: View {
+    let monitor: PowerMonitor
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Live power")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Image(systemName: "bolt.fill")
+                    .foregroundStyle(.tertiary)
+            }
+            Text(monitor.reading.wattsText)
+                .font(.system(size: 30, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .contentTransition(.numericText())
+            Text(monitor.reading.wattDirection)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text(monitor.reading.livePowerExplanation)
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
+    }
+}
+
+private struct ChargeView: View {
+    let monitor: PowerMonitor
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 10) {
                     HStack {
-                        Text("LIVE POWER")
+                        Text("Charge status")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.secondary)
                         Spacer()
-                        Image(systemName: "bolt.fill")
-                            .foregroundStyle(.tertiary)
+                        Image(systemName: monitor.reading.symbolName)
+                            .foregroundStyle(batteryLevelColor(for: monitor.reading))
                     }
-                    Text(monitor.reading.wattsText)
-                        .font(.system(size: 30, weight: .semibold, design: .rounded))
-                        .monospacedDigit()
-                        .contentTransition(.numericText())
-                    Text(monitor.reading.wattDirection)
+
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(monitor.reading.levelText)
+                            .font(.system(size: 30, weight: .semibold, design: .rounded))
+                            .monospacedDigit()
+                            .contentTransition(.numericText())
+                        Text(monitor.reading.statusTitle)
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Text(monitor.reading.statusDetail)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Text(monitor.reading.livePowerExplanation)
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Divider()
+
+                    ReadingRow(label: "Battery flow", value: "\(monitor.reading.wattsText) · \(monitor.reading.wattDirection)")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .cardStyle()
 
-                PowerInputCard(monitor: monitor)
-
-                EnergyUseCard(monitor: monitor)
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("DETAILS")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    ReadingRow(label: "Voltage", value: monitor.reading.voltageMillivolts.map { String(format: "%.2f V", Double($0) / 1000) } ?? "—")
-                    ReadingRow(label: "Current", value: monitor.reading.amperageMilliamps.map { String(format: "%.2f A", Double($0) / 1000) } ?? "—")
-                    ReadingRow(
-                        label: "Battery temperature",
-                        value: monitor.reading.temperaturePresentationText,
-                        valueColor: temperatureColor
-                    )
-                    .help("Presentation cue only, not a battery safety limit")
-                    ReadingRow(label: "Cycle count", value: monitor.reading.cycleCount.map(String.init) ?? "—")
-                    ReadingRow(label: "Maximum capacity", value: monitor.reading.maxCapacity.map { "\($0)%" } ?? "—")
-                }
-                .cardStyle()
+                BatteryDetailsCard(monitor: monitor)
+                ActivityView(monitor: monitor)
             }
             .padding(16)
         }
+    }
+}
+
+private struct BatteryDetailsCard: View {
+    let monitor: PowerMonitor
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Battery details")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            ReadingRow(label: "Voltage", value: monitor.reading.voltageMillivolts.map { String(format: "%.2f V", Double($0) / 1000) } ?? "—")
+            ReadingRow(label: "Current", value: monitor.reading.amperageMilliamps.map { String(format: "%.2f A", Double($0) / 1000) } ?? "—")
+            ReadingRow(
+                label: "Battery temperature",
+                value: monitor.reading.temperaturePresentationText,
+                valueColor: temperatureColor
+            )
+            .help("Presentation cue only, not a battery safety limit")
+            ReadingRow(label: "Cycle count", value: monitor.reading.cycleCount.map(String.init) ?? "—")
+            ReadingRow(label: "Maximum capacity", value: monitor.reading.maxCapacity.map { "\($0)%" } ?? "—")
+        }
+        .cardStyle()
     }
 
     private var temperatureColor: Color {
@@ -403,13 +513,26 @@ private struct OverviewView: View {
     }
 }
 
+private struct UsageView: View {
+    let monitor: PowerMonitor
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                EnergyUseCard(monitor: monitor)
+            }
+            .padding(16)
+        }
+    }
+}
+
 private struct PowerInputCard: View {
     let monitor: PowerMonitor
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("POWER INPUT")
+                Text("Power input")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
                 Spacer()
@@ -467,63 +590,53 @@ private struct PowerInputCard: View {
     }
 }
 
-private struct ConnectionsView: View {
+private struct CableDetailsCard: View {
     let monitor: PowerMonitor
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("PORTS")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    Text("Active USB-C and MagSafe ports")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Cable details")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Text("\(monitor.cables.connectedPorts.count) active")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tertiary)
             }
-            .padding(16)
 
-            Divider()
-
-            if !monitor.cables.isAvailable, monitor.lastUpdated == nil {
-                ContentUnavailableView(
-                    "Reading Ports",
-                    systemImage: "cable.connector",
-                    description: Text("Waiting for macOS to report USB-C and MagSafe state.")
-                )
-            } else if !monitor.cables.isAvailable {
-                ContentUnavailableView(
-                    "Port Details Unavailable",
-                    systemImage: "cable.connector.slash",
-                    description: Text("This Mac or the current macOS state is not exposing supported port telemetry.")
-                )
+            if !monitor.cables.isAvailable {
+                Label("Cable telemetry unavailable", systemImage: "cable.connector.slash")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Text("This Mac or the current macOS state is not exposing supported port details.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             } else if monitor.cables.connectedPorts.isEmpty {
-                ContentUnavailableView(
-                    "No Active Connections",
-                    systemImage: "cable.connector.slash",
-                    description: Text("Connect a charger, display, dock, or USB-C device to inspect its exposed capabilities.")
-                )
+                Label("No active cable connections", systemImage: "cable.connector.slash")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Text("Connect a charger, display, dock, or USB-C device to inspect its capabilities.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             } else {
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(monitor.cables.connectedPorts) { port in
-                            connectionCard(port)
-                        }
+                ForEach(monitor.cables.connectedPorts) { port in
+                    if port.id != monitor.cables.connectedPorts.first?.id {
+                        Divider()
                     }
-                    .padding(16)
+                    cableRow(port)
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
     }
 
-    private func connectionCard(_ port: CablePort) -> some View {
+    private func cableRow(_ port: CablePort) -> some View {
         let diagnostic = port.diagnostic(for: monitor.reading)
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 9) {
                 Image(systemName: port.symbolName)
                     .font(.title3)
@@ -532,17 +645,21 @@ private struct ConnectionsView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(port.displayName)
                         .font(.subheadline.weight(.semibold))
-                    Text(diagnostic.title)
+                    Text(port.connectionSummary(includeNegotiatedPower: true))
                         .font(.caption)
-                        .foregroundStyle(diagnosticColor(diagnostic.severity))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
             }
 
             if diagnostic.severity != .normal {
+                Label(diagnostic.title, systemImage: diagnosticSymbol(diagnostic.severity))
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(diagnosticColor(diagnostic.severity))
                 Text(diagnostic.detail)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -565,9 +682,6 @@ private struct ConnectionsView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .cardStyle()
-        .accessibilityElement(children: .combine)
     }
 }
 
@@ -586,7 +700,7 @@ private struct EnergyUseCard: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("ENERGY USE")
+                    Text("Energy use")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
                     Text("Relative impact, not attributed watts")
@@ -694,52 +808,49 @@ private struct ActivityView: View {
     let monitor: PowerMonitor
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                activitySection("POWER ASSERTIONS", empty: "No active assertions", items: monitor.assertions) { assertion in
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "moon.zzz")
-                            .foregroundStyle(.orange)
-                            .frame(width: 18)
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack {
-                                Text(assertion.process).fontWeight(.medium)
-                                Spacer()
-                                Text(assertion.age).foregroundStyle(.tertiary)
-                            }
-                            Text(assertion.kind).foregroundStyle(.secondary)
-                            Text(assertion.reason).foregroundStyle(.tertiary).lineLimit(2)
+        VStack(alignment: .leading, spacing: 12) {
+            activitySection("Power holds", empty: "No active sleep or power holds", items: monitor.assertions) { assertion in
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "moon.zzz")
+                        .foregroundStyle(.orange)
+                        .frame(width: 18)
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Text(assertion.process).fontWeight(.medium)
+                            Spacer()
+                            Text(assertion.age).foregroundStyle(.tertiary)
                         }
-                    }
-                }
-
-                activitySection("RECENT POWER EVENTS", empty: "No recent power events", items: monitor.events) { event in
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: event.symbolName)
-                            .foregroundStyle(event.tintRole.color)
-                            .frame(width: 18)
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack {
-                                Text(event.title)
-                                    .font(.subheadline.weight(.medium))
-                                Spacer()
-                                if let date = event.date {
-                                    Text(date.relativeDescription)
-                                        .font(.caption)
-                                        .foregroundStyle(.tertiary)
-                                }
-                            }
-                            Text(event.detail)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                        }
+                        Text(assertion.kind).foregroundStyle(.secondary)
+                        Text(assertion.reason).foregroundStyle(.tertiary).lineLimit(2)
                     }
                 }
             }
-            .font(.caption)
-            .padding(16)
+
+            activitySection("Recent power events", empty: "No recent power events", items: monitor.events) { event in
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: event.symbolName)
+                        .foregroundStyle(event.tintRole.color)
+                        .frame(width: 18)
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Text(event.title)
+                                .font(.subheadline.weight(.medium))
+                            Spacer()
+                            if let date = event.date {
+                                Text(date.relativeDescription)
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                        Text(event.detail)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
+                }
+            }
         }
+        .font(.caption)
     }
 
     private func activitySection<Item: Identifiable, Content: View>(
@@ -781,10 +892,11 @@ private struct SnapshotsView: View {
                 Button { monitor.openSnapshotsFolder() } label: {
                     Image(systemName: "folder")
                 }
-                    .buttonStyle(.borderless)
-                    .help("Show snapshots in Finder")
-                    .accessibilityLabel("Show snapshots in Finder")
-                    .disabled(monitor.snapshots.isEmpty && monitor.snapshotLoadError == nil)
+                .buttonStyle(.borderless)
+                .frame(width: 24, height: 24)
+                .help("Show snapshots in Finder")
+                .accessibilityLabel("Show snapshots in Finder")
+                .disabled(monitor.snapshots.isEmpty && monitor.snapshotLoadError == nil)
             }
             .padding(16)
 
@@ -820,6 +932,7 @@ private struct SnapshotsView: View {
                     }
                 }
                 .listStyle(.inset)
+                .scrollContentBackground(.hidden)
             }
         }
     }
@@ -892,6 +1005,12 @@ private func diagnosticColor(_ severity: CableDiagnostic.Severity) -> Color {
     case .informational: .secondary
     case .warning: .orange
     }
+}
+
+private func batteryLevelColor(for reading: BatteryReading) -> Color {
+    if reading.isOnExternalPower { return .green }
+    if (reading.percentage ?? 100) <= 20 { return .red }
+    return .primary
 }
 
 private func diagnosticSymbol(_ severity: CableDiagnostic.Severity) -> String {

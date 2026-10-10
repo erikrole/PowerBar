@@ -12,6 +12,11 @@ a promise of complete hardware coverage for every Mac.
 - timestamped local snapshots stored as readable JSON, with adjacent level and same-direction draw comparisons
 - active USB-C and MagSafe connections, including negotiated charger power, cable power and data ratings, and charging bottleneck diagnostics
 
+The popover keeps its daily workflow to three tabs: Power for live flow and
+cable details, Charge for the current level, draw, holds, and recent events,
+and Usage for significant energy consumers. Battery history and manual
+snapshots remain available from the overflow menu.
+
 The live wattage is calculated from smart-battery voltage × instantaneous current. It describes battery flow, not the power adapter's rated wattage.
 
 ## Build and run
