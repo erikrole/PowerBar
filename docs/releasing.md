@@ -1,5 +1,9 @@
 # Releasing PowerBar
 
+**Retired October 23, 2026.** Version 0.1.1 (build 5) is the final release.
+The repository is archived and its GitHub Actions workflows are disabled.
+The following procedure is retained for historical reference.
+
 PowerBar is distributed directly as a signed and notarized Apple Silicon ZIP
 attached to a GitHub Release. Homebrew is intentionally deferred until the app
 has a stable release cadence.

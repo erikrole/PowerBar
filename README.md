@@ -1,5 +1,10 @@
 # PowerBar
 
+**Retired October 23, 2026.** Development and new releases have ended, and this
+repository is archived. [0.1.1 (build 5)](https://github.com/erikrole/PowerBar/releases/tag/v0.1.1)
+is the final release and requires macOS 27 or later. Existing downloads and source
+history are retained. The instructions below describe the archived implementation.
+
 PowerBar is a native macOS menu bar utility for live battery context on a
 personal M5 Max MacBook Pro. It is intentionally a focused personal tool, not
 a promise of complete hardware coverage for every Mac.
@@ -55,9 +60,9 @@ xcodebuild -project PowerBar.xcodeproj -scheme PowerBar -destination 'platform=m
 
 ## Releases
 
-Direct distribution uses signed and notarized arm64 ZIPs attached to GitHub
-Releases. See [`docs/releasing.md`](docs/releasing.md) for the local and GitHub
-Actions release workflow; those release paths retain their signing requirements.
+The final signed and notarized arm64 ZIP remains attached to GitHub Releases.
+GitHub Actions workflows are disabled. [`docs/releasing.md`](docs/releasing.md)
+preserves the historical release procedure.
 
 ## License
 
