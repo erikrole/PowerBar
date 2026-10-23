@@ -16,7 +16,7 @@ require_command() {
     }
 }
 
-for command in xcodegen xcodebuild security codesign ditto xcrun shasum lipo; do
+for command in xcodegen xcodebuild security codesign ditto xcrun shasum lipo python3; do
     require_command "$command"
 done
 
@@ -132,14 +132,15 @@ ARCHITECTURES="$(lipo -archs "$APP_PATH/Contents/MacOS/PowerBar")"
 
 ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
 
+NOTARY_RESULT="$OUTPUT_DIR/notarization.json"
 if [[ -n "$NOTARY_PROFILE" ]]; then
-    xcrun notarytool submit "$ZIP_PATH" --keychain-profile "$NOTARY_PROFILE" --wait
+    xcrun notarytool submit "$ZIP_PATH" --keychain-profile "$NOTARY_PROFILE" --wait --output-format json > "$NOTARY_RESULT"
 else
     xcrun notarytool submit "$ZIP_PATH" \
         --key "$NOTARY_PRIVATE_KEY_PATH" \
         --key-id "$NOTARY_KEY_ID" \
         --issuer "$NOTARY_ISSUER_ID" \
-        --wait
+        --wait --output-format json > "$NOTARY_RESULT"
 fi
 
 xcrun stapler staple "$APP_PATH"
@@ -150,6 +151,10 @@ ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
     cd "$(dirname "$ZIP_PATH")"
     shasum -a 256 "$(basename "$ZIP_PATH")"
 ) > "$SHA_PATH"
+
+spctl --assess --type execute --verbose=2 "$APP_PATH"
+python3 scripts/write-release-manifest.py "$APP_PATH" "$ZIP_PATH" "$NOTARY_RESULT" "$(git rev-parse HEAD)" \
+    PowerBar.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved > "$OUTPUT_DIR/release-manifest.json"
 
 echo "Release artifacts:"
 echo "  $ZIP_PATH"

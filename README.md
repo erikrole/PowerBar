@@ -71,4 +71,4 @@ AppUpdater checks [erikrole/PowerBar](https://github.com/erikrole/PowerBar/relea
 
 `project.yml` pins the public [AppUpdater](https://github.com/erikrole/AppUpdater) package to `5b5a9411078b79ad92e36bf9d965ecd94b66b420`; rerun XcodeGen after changing the pin. Keep package resolution checked in. App and package targets require **macOS 27**. The host retains its save and busy checks during updater relaunch; no forced-exit fallback is configured.
 
-Integration prepared on October 23, 2026. This source change needs a new app release before installed copies adopt it.
+Published on October 23, 2026 as [PowerBar 0.1.1](https://github.com/erikrole/PowerBar/releases/tag/v0.1.1), build 5, from source `5b4877daeba861155c347da0542cabcd09fff0ec`. The Apple Silicon ZIP requires macOS 27 or later and is Developer ID signed, notarized, and stapled. A SHA-256 checksum and provenance manifest are attached to the release.

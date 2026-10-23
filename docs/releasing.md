@@ -71,3 +71,11 @@ Release with both files attached.
 
 Do not commit certificates, private keys, provisioning assets, or notarization
 credentials.
+
+## Verified updater release: 0.1.1 (build 5)
+
+Published October 23, 2026 at [PowerBar 0.1.1](https://github.com/erikrole/PowerBar/releases/tag/v0.1.1). Source commit: `5b4877daeba861155c347da0542cabcd09fff0ec`. The app and its owned extensions/helpers require macOS 27.0 in Info.plist and Mach-O. The arm64 ZIP is Developer ID signed with Team `T26T3G8C7Q`, accepted by Apple notarization, stapled, and accepted by Gatekeeper after fresh extraction. ZIP/checksum/provenance digests match GitHub. Host tests: 44 reported, 0 skipped, zero failures. AppUpdater’s live download/verification path also passed for this public release.
+
+## Rechecking an existing release
+
+`./scripts/verify-published-release.sh v0.1.1` downloads and verifies the published ZIP, checksum, provenance, signing, notarization ticket, and macOS 27 minimum. It never changes release assets. To run the corrected workflow against an existing tag, dispatch the current main workflow with `gh workflow run release.yml --ref main -f tag=v0.1.1`. The workflow checks out the exact tag, preserves an existing published release, and validates its artifacts; new releases include the same provenance manifest.
