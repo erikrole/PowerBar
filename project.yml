@@ -24,8 +24,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.erole.PowerBar
         PRODUCT_NAME: PowerBar
-        MARKETING_VERSION: "0.1.0"
-        CURRENT_PROJECT_VERSION: "4"
+        MARKETING_VERSION: "0.1.1"
+        CURRENT_PROJECT_VERSION: "5"
         ENABLE_HARDENED_RUNTIME: YES
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: PowerBar/Info.plist
