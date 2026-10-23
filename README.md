@@ -1,6 +1,6 @@
 # PowerBar
 
-**Retired October 23, 2026.** Development and new releases have ended.
+**Retired October 23, 2026.** Development and new releases have ended. This repository is archived.
 [0.1.1 (build 5)](https://github.com/erikrole/PowerBar/releases/tag/v0.1.1)
 is the final release and requires macOS 27 or later. Existing downloads and source
 history are retained. The instructions below describe the archived implementation.
@@ -61,7 +61,7 @@ xcodebuild -project PowerBar.xcodeproj -scheme PowerBar -destination 'platform=m
 ## Releases
 
 The final signed and notarized arm64 ZIP remains attached to GitHub Releases.
-Repository archival and GitHub Actions shutdown await explicit approval.
+Both GitHub Actions workflows are disabled.
 [`docs/releasing.md`](docs/releasing.md) preserves the historical release procedure.
 
 ## License
