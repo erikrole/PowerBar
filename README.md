@@ -21,7 +21,7 @@ The live wattage is calculated from smart-battery voltage × instantaneous curre
 
 ## Build and run
 
-Requirements: macOS 14 or later, Xcode, and XcodeGen.
+Requirements: macOS 27 or later, Xcode 27 or later, and XcodeGen.
 
 For an unsigned local contributor build:
 

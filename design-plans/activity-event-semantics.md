@@ -50,7 +50,7 @@ Move event presentation semantics onto `PowerEvent` so each known event type own
 
 ## Stop conditions
 
-- Stop if SF Symbol availability conflicts with the macOS 14 deployment target; substitute only with a symbol confirmed available on macOS 14.
+- Stop if SF Symbol availability conflicts with the macOS 27 deployment target; substitute only with a symbol confirmed available on macOS 27.
 
 ## Design documentation
 
