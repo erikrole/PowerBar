@@ -190,6 +190,7 @@ struct PowerBarView: View {
                     Text(error)
                 }
                 Divider()
+                Button("Check for Updates…") { AppUpdate.checkNow() }
                 Button("Quit PowerBar") { NSApplication.shared.terminate(nil) }
             } label: {
                 Image(systemName: "ellipsis.circle")

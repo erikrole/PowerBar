@@ -12,6 +12,7 @@
 		07821CB6237A111FF87D7212 /* CableStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73BE9AD07C523AE75D0A242 /* CableStatusTests.swift */; };
 		19242B66EDE829CD14385DB6 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = FBD649B0E3A195ACC5816336 /* AppIcon.icns */; };
 		1D13CAAC474D3CE2EF963F2E /* CableModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AC064A256F9350F9104BED /* CableModels.swift */; };
+		2A367F4E7F983519FEF3C823 /* AppUpdater in Frameworks */ = {isa = PBXBuildFile; productRef = E6C7C604C1FE498EE213F0F5 /* AppUpdater */; };
 		2FB274C7D0848F80C205E57D /* LaunchAtLoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15262D6938DA42707E7663E8 /* LaunchAtLoginController.swift */; };
 		5187E0640E31E75020E0A0EF /* PowerBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D62DF852AB5CAF40A88622DB /* PowerBarApp.swift */; };
 		551999AAF9B1C999BB98156B /* PowerBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7339735B1A310EAD97237EA7 /* PowerBarView.swift */; };
@@ -20,6 +21,7 @@
 		6DC2D6BB16485F865200A751 /* PowerParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC258A49EC73A2296D3FEB63 /* PowerParserTests.swift */; };
 		C787C52643836F5C55F3E904 /* PowerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA913F5AC38EBAB3AE3BB45 /* PowerDataSource.swift */; };
 		DD23CF6808CB75E3135AD4D5 /* CableNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501713BA30A9D6FA1EDBCFB3 /* CableNotifications.swift */; };
+		F067CDEEFB56345C14B51F38 /* AppUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96577760E61F9065DAACAE32 /* AppUpdate.swift */; };
 		FCE3D2AA6E3A45FA2C0B5D23 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8B8EB32DEE095B165AA107 /* Models.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +46,7 @@
 		53980A09B511EE59F740D869 /* PowerBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PowerBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7339735B1A310EAD97237EA7 /* PowerBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerBarView.swift; sourceTree = "<group>"; };
 		7693C77250CC3C98CA6335D9 /* CableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CableDataSource.swift; sourceTree = "<group>"; };
+		96577760E61F9065DAACAE32 /* AppUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdate.swift; sourceTree = "<group>"; };
 		96826878E696A7B4A4CF39C0 /* PowerSourceObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerSourceObserver.swift; sourceTree = "<group>"; };
 		D62DF852AB5CAF40A88622DB /* PowerBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerBarApp.swift; sourceTree = "<group>"; };
 		DB8B8EB32DEE095B165AA107 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -52,6 +55,17 @@
 		FBD649B0E3A195ACC5816336 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		FC258A49EC73A2296D3FEB63 /* PowerParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerParserTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		50E9D283880AE65DCAD194A6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A367F4E7F983519FEF3C823 /* AppUpdater in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		48D2AB163D5FB62AB79287C6 /* PowerBarTests */ = {
@@ -67,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				FBD649B0E3A195ACC5816336 /* AppIcon.icns */,
+				96577760E61F9065DAACAE32 /* AppUpdate.swift */,
 				518F009FA94AEB15980936FC /* Assets.xcassets */,
 				7693C77250CC3C98CA6335D9 /* CableDataSource.swift */,
 				45AC064A256F9350F9104BED /* CableModels.swift */,
@@ -110,6 +125,7 @@
 			buildPhases = (
 				C177D79E4B89E1B5EDDBCC59 /* Sources */,
 				C64483E17FF9533DFA02304D /* Resources */,
+				50E9D283880AE65DCAD194A6 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -117,6 +133,7 @@
 			);
 			name = PowerBar;
 			packageProductDependencies = (
+				E6C7C604C1FE498EE213F0F5 /* AppUpdater */,
 			);
 			productName = PowerBar;
 			productReference = 320284A0D6756F79C10D46E8 /* PowerBar.app */;
@@ -167,6 +184,9 @@
 			);
 			mainGroup = B11688F5B01A84FB3BB57CB5;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3C0EA0A22F7EB8E414D1B91B /* XCRemoteSwiftPackageReference "AppUpdater" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DDFDAAC27E4999E32B2B77E0 /* Products */;
 			projectDirPath = "";
@@ -204,6 +224,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F067CDEEFB56345C14B51F38 /* AppUpdate.swift in Sources */,
 				62E1B63633502C18D77D5FB6 /* CableDataSource.swift in Sources */,
 				1D13CAAC474D3CE2EF963F2E /* CableModels.swift in Sources */,
 				DD23CF6808CB75E3135AD4D5 /* CableNotifications.swift in Sources */,
@@ -468,6 +489,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3C0EA0A22F7EB8E414D1B91B /* XCRemoteSwiftPackageReference "AppUpdater" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/erikrole/AppUpdater.git";
+			requirement = {
+				kind = revision;
+				revision = 5b5a9411078b79ad92e36bf9d965ecd94b66b420;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E6C7C604C1FE498EE213F0F5 /* AppUpdater */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3C0EA0A22F7EB8E414D1B91B /* XCRemoteSwiftPackageReference "AppUpdater" */;
+			productName = AppUpdater;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C2DF0B0D82AB28324E170728 /* Project object */;
 }

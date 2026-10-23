@@ -21,11 +21,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var outsideClickMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil,
+              NSClassFromString("XCTestCase") == nil else { return }
         configurePopover()
         configureStatusItem()
         configureOutsideClickMonitor()
         observeMonitor()
         monitor.startCableNotifications()
+        AppUpdate.checkOnLaunch()
     }
 
     private func configureStatusItem() {
@@ -84,6 +87,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
                 self.observeMonitor()
             }
         }
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        AppUpdate.isPreparing ? .terminateCancel : .terminateNow
     }
 
     func applicationWillTerminate(_ notification: Notification) {
